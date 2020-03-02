@@ -1,5 +1,8 @@
-const database = require("../src/database");
-const blockchainModel = require("../src/database/model");
+const admin = require("firebase-admin");
+const database = require("../src/database/index");
+
+const db = admin.database();
+const chainRef = db.ref('blockchain/chain');
 
 const Blockchain = require('../src/models/blockchain');
 const Transaction = require('../src/models/transaction');
@@ -44,64 +47,59 @@ let mineProduct = (req, res) => {
 
 let productByIndex = (req, res) => {
 	let id = req.params.id;
-	
-	blockchainModel.findOne({'index': id}, (err, userDocs)=>{
-		if (err) {
-			res.json({
-                "status": "error",
-                "message": `Something went wrong!`  
-            });
-		}
+	let result;
 
-        if (userDocs === null || userDocs.length == 0) {
-            res.json({
+	chainRef.once("value", snapshot => {
+	  	snapshot.forEach(doc => {
+		  	if (doc.val().block.index == id) {
+		  		result = doc.val().block;
+		  	}
+	  	});
+
+	  	if (result == undefined) {
+	  		res.json({
                 "status": "fail",
                 "message": `Coudn't find any products with id '${id}'`  
             });
-        } else {
-            res.json({
-                "status": "success",
-                "message": userDocs
-            });
-        }
-    });
+	  	} else {
+	  		res.json({
+			    "status": "success",
+			    "data": result
+			});
+	  	}
+	});
 }
 
 let productBySender = (req, res) => {
 	let sender = req.params.sender;
 	let result = [];
 
-	blockchainModel.aggregate([{$project: { transactions: 1, _id: 0}}], (err, blocks) => {
-		if (err) {
-			res.json({
-                "status": "error",
-                "message": `Something went wrong!`  
-            });
-		}
+	chainRef.once("value", snapshot => {
+	  	snapshot.forEach(doc => {
+	  		let transactions = doc.val().block.transactions;
 
-		blocks.forEach((transactions) => {
-			Object.values(transactions)[0].forEach((transaction) => {
-				let fromAdress = transaction[0].fromAdress;
-				if (fromAdress != undefined) {
-					if (fromAdress.toLowerCase().includes(sender.toLowerCase())) {
-						result.push(transaction[0]);
-					}
-				}
-			});
-		});
+	  		if (Array.isArray(transactions)) {
+	  			transactions.forEach(transaction => {
+		  			let fromAdress = transaction.fromAdress;
+	  				if (fromAdress.toLowerCase().includes(sender.toLowerCase())) {
+				  		result.push(transaction);
+				  	}
+		  		});
+	  		}
+	  	});
 
-		if (result.length === 0) {
-			res.json({
+	  	if (result.length === 0) {
+	  		res.json({
 	            "status": "fail",
 	            "message": `Coudn't find any products with sender '${sender}'`
 	        });
-		} else {
-			res.json({
-	            "status": "success",
-	            "amount": `Found '${result.length}' results where the senders name '${sender}' contains.`,
-	            "message": result
-	        });
-		}
+	  	} else {
+	  		res.json({
+			    "status": "success",
+			    "amount": `Found '${result.length}' results that '${sender}' contains.`,
+			    "data": result
+			});
+	  	}
 	});
 }
 
@@ -109,38 +107,32 @@ let productByName = (req, res) => {
 	let name = req.params.name;
 	let result = [];
 
-	blockchainModel.aggregate([{$project: { transactions: 1, _id: 0}}], (err, blocks) => {
-		if (err) {
-			res.json({
-                "status": "error",
-                "message": `Something went wrong!`  
-            });
-		}
+	chainRef.once("value", snapshot => {
+	  	snapshot.forEach(doc => {
+	  		let transactions = doc.val().block.transactions;
 
-		blocks.forEach((transactions) => {
-			Object.values(transactions)[0].forEach((transaction) => {
-				let productName = transaction[0].transaction;
-				if (productName != undefined) {
-					productName = productName.product.name;
-					if (productName.toLowerCase().includes(name.toLowerCase())) {
-						result.push(transaction);
-					}
-				}
-			});
-		});
+	  		if (Array.isArray(transactions)) {
+	  			transactions.forEach(transaction => {
+		  			let productName = transaction.transaction.product.name;
+	  				if (productName.toLowerCase().includes(name.toLowerCase())) {
+				  		result.push(transaction);
+				  	}
+		  		});
+	  		}
+	  	});
 
-		if (result.length === 0) {
-			res.json({
+	  	if (result.length === 0) {
+	  		res.json({
 	            "status": "fail",
-	            "message": `Coudn't find any products with name '${name}'`
+	            "message": `Coudn't find any products with the name '${name}'`
 	        });
-		} else {
-			res.json({
-	            "status": "success",
-	            "amount": `Found '${result.length}' products that contain '${name}'.`,
-	            "message": result
-	        });
-		}
+	  	} else {
+	  		res.json({
+			    "status": "success",
+			    "amount": `Found '${result.length}' results that '${name}' contains.`,
+			    "data": result
+			});
+	  	}
 	});
 }
 

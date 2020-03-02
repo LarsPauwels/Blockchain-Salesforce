@@ -11,6 +11,8 @@
     "crypto-js": "^4.0.0",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "firebase-admin": "^8.9.2",
+    "firebase-functions": "^3.3.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "mongodb": "^2.2.5",

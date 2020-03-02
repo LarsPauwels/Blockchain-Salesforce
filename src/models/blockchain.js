@@ -1,13 +1,14 @@
 const Block = require('./block');
-const mongoose = require("mongoose");
+const admin = require("firebase-admin");
+const database = require("../database/index");
 
-const blockchainModel = mongoose.model("Blockchain");
-const blockchainDB = require("../database/model");
+const db = admin.database();
+const chainRef = db.ref('blockchain/chain');
 
 class Blockchain {
 	constructor() {
 		this.getData((chain) => {
-			this.chain = chain;
+			this.chain = [chain];
 		});
 
 		this.pendingTransaction = [];
@@ -15,12 +16,16 @@ class Blockchain {
 	}
 
 	getData(callback) {
-		blockchainDB.find({}).then((chain) => {
-			if (chain.length === 0) {
-				return callback(this.createGenesisBlock());
-			} else {
-				return callback(chain);
-			}
+		return chainRef.once("value", snapshot => {
+		  	if (snapshot.numChildren() === 0) {
+		        return callback(this.createGenesisBlock());
+		    } else {
+		    	let result = [];
+		    	chainRef.once("value", snapshot => {
+		    		result.push(snapshot.val());
+		    	});
+		    	return callback(result);
+		    }
 		});
 	}
 
@@ -35,14 +40,14 @@ class Blockchain {
 	}
 
 	getIndex(callback) {
-		return blockchainDB.countDocuments().then((count) => {
-		    return callback(count);
+		return chainRef.once("value", snapshot => {
+			return callback(snapshot.numChildren());
 		});
 	}
 
 	minePendingTransaction() {
-		this.getIndex((count) => {
-			let block = new Block(count, this.pendingTransaction, this.getLatestBlock().hash);
+		this.getIndex((size) => {
+			let block = new Block(size, this.pendingTransaction, this.getLatestBlock().hash);
 			block.mineBlock(this.difficulty);
 			this.addToDatabase(block);
 
@@ -52,12 +57,8 @@ class Blockchain {
 	}
 
 	addToDatabase(block) {
-		let newBlock = new blockchainModel(block);
-		newBlock.save((err) => {
-			if (err) {
-				return console.log("Cannot save block to DB: ", err.message);
-			}
-			console.log("Block saved on to the DB");
+		chainRef.push({
+			block
 		});
 	}
 
