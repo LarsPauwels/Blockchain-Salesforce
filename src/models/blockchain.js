@@ -1,12 +1,18 @@
 const Block = require('./block');
+const Validation = require('./validation');
 const admin = require("firebase-admin");
 const database = require("../database/index");
+const validation = new Validation();
 
 const db = admin.database();
-const chainRef = db.ref('blockchain/chain');
+const chainUsersRef = db.ref('blockchain/chain-users');
+const chainV1Ref = db.ref('blockchain/chain-v1');
+const chainV2Ref = db.ref('blockchain/chain-v2');
 
 class Blockchain {
 	constructor() {
+		validation.dataChanges();
+
 		this.getData((chain) => {
 			this.chain = [chain];
 		});
@@ -16,12 +22,12 @@ class Blockchain {
 	}
 
 	getData(callback) {
-		return chainRef.once("value", snapshot => {
+		return chainUsersRef.once("value", snapshot => {
 		  	if (snapshot.numChildren() === 0) {
 		        return callback(this.createGenesisBlock());
 		    } else {
 		    	let result = [];
-		    	chainRef.once("value", snapshot => {
+		    	chainUsersRef.once("value", snapshot => {
 		    		result.push(snapshot.val());
 		    	});
 		    	return callback(result);
@@ -40,7 +46,7 @@ class Blockchain {
 	}
 
 	getIndex(callback) {
-		return chainRef.once("value", snapshot => {
+		return chainUsersRef.once("value", snapshot => {
 			return callback(snapshot.numChildren());
 		});
 	}
@@ -57,8 +63,35 @@ class Blockchain {
 	}
 
 	addToDatabase(block) {
-		chainRef.push({
-			block
+		chainUsersRef.push({
+			index: block.index,
+			timestamp: block.timestamp,
+			transactions: block.transactions,
+			previousHash: block.previousHash,
+			hash: block.hash,
+			nonce: block.nonce
+		}).then((snap) => {
+			this.addDataToVersions(block, snap.key);
+		});
+	}
+
+	addDataToVersions(block, id) {
+		chainV1Ref.child(id).set({
+			index: block.index,
+			timestamp: block.timestamp,
+			transactions: block.transactions,
+			previousHash: block.previousHash,
+			hash: block.hash,
+			nonce: block.nonce
+		});
+
+		chainV2Ref.child(id).set({
+			index: block.index,
+			timestamp: block.timestamp,
+			transactions: block.transactions,
+			previousHash: block.previousHash,
+			hash: block.hash,
+			nonce: block.nonce
 		});
 	}
 

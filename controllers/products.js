@@ -2,7 +2,9 @@ const admin = require("firebase-admin");
 const database = require("../src/database/index");
 
 const db = admin.database();
-const chainRef = db.ref('blockchain/chain');
+const chainUserRef = db.ref('blockchain/chain-users');
+const chainV1Ref = db.ref('blockchain/chain-v1');
+const chainV2Ref = db.ref('blockchain/chain-v2');
 
 const Blockchain = require('../src/models/blockchain');
 const Transaction = require('../src/models/transaction');
@@ -49,7 +51,7 @@ let productByIndex = (req, res) => {
 	let id = req.params.id;
 	let result;
 
-	chainRef.once("value", snapshot => {
+	chainUserRef.once("value", snapshot => {
 	  	snapshot.forEach(doc => {
 		  	if (doc.val().block.index == id) {
 		  		result = doc.val().block;
@@ -74,7 +76,7 @@ let productBySender = (req, res) => {
 	let sender = req.params.sender;
 	let result = [];
 
-	chainRef.once("value", snapshot => {
+	chainUserRef.once("value", snapshot => {
 	  	snapshot.forEach(doc => {
 	  		let transactions = doc.val().block.transactions;
 
@@ -107,7 +109,7 @@ let productByName = (req, res) => {
 	let name = req.params.name;
 	let result = [];
 
-	chainRef.once("value", snapshot => {
+	chainUserRef.once("value", snapshot => {
 	  	snapshot.forEach(doc => {
 	  		let transactions = doc.val().block.transactions;
 
