@@ -38,7 +38,7 @@ class Blockchain {
 	}
 
 	createGenesisBlock() {
-		let block = new Block(0, "Genesis block", "0");
+		let block = new Block(0, [{"fromAdress": "Genesis block"}], "0");
 		this.addToDatabase(block);
 		return block;
 	}
@@ -64,12 +64,12 @@ class Blockchain {
 
 	minePendingTransaction() {
 		this.getIndex((size) => {
-			let block = new Block(size, this.pendingTransaction, this.getLatestBlock()[0][this.getIdLatestBlock()].hash);
+			let block = new Block(size, this.pendingTransaction, this.getLatestBlock()[this.getIdLatestBlock()].hash);
 			block.mineBlock(this.difficulty);
 			this.addToDatabase(block);
 
 			this.chain.push(block);
-			this.pendingTransaction = []; 
+			this.pendingTransaction = [];
 		});
 	}
 
