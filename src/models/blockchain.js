@@ -16,7 +16,7 @@ class Blockchain {
 		validation.dataAdds();
 
 		this.getData((chain) => {
-			this.chain = [chain];
+			this.chain = chain;
 		});
 
 		this.pendingTransaction = [];
