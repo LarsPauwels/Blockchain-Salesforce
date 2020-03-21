@@ -53,7 +53,7 @@ let productByIndex = (req, res) => {
 
 	chainUserRef.once("value", snapshot => {
 	  	snapshot.forEach(doc => {
-		  	if (doc.val().block.index == id) {
+		  	if (doc.val().index == id) {
 		  		result = doc.val().block;
 		  	}
 	  	});
@@ -78,7 +78,7 @@ let productBySender = (req, res) => {
 
 	chainUserRef.once("value", snapshot => {
 	  	snapshot.forEach(doc => {
-	  		let transactions = doc.val().block.transactions;
+	  		let transactions = doc.val().transactions;
 
 	  		if (Array.isArray(transactions)) {
 	  			transactions.forEach(transaction => {
@@ -111,7 +111,7 @@ let productByName = (req, res) => {
 
 	chainUserRef.once("value", snapshot => {
 	  	snapshot.forEach(doc => {
-	  		let transactions = doc.val().block.transactions;
+	  		let transactions = doc.val().transactions;
 
 	  		if (Array.isArray(transactions)) {
 	  			transactions.forEach(transaction => {
