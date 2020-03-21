@@ -26,44 +26,50 @@ class Validation {
 			let data = snapshot.val();
 		  	this.compareData(id, data);
 		});
+	}
 
-		/*Doesn't add to quickly*/
-		// chainUsersRef.on("child_added", (snapshot) => {
-		// 	let id = snapshot.key;
-		// 	let data = snapshot.val();
-		//   	this.compareData(id, data);
-		// });
+	dataDeletes() {
+		chainUsersRef.on("child_removed", (snapshot) => {
+			let id = snapshot.key;
+			let data = snapshot.val();
+		  	this.compareData(id, data);
+		});
 
-		// chainV1Ref.on("child_added", (snapshot) => {
-		// 	let id = snapshot.key;
-		// 	let data = snapshot.val();
-		//   	this.compareData(id, data);
-		// });
+		chainV1Ref.on("child_removed", (snapshot) => {
+			let id = snapshot.key;
+			let data = snapshot.val();
+		  	this.compareData(id, data);
+		});
 
-		// chainV2Ref.on("child_added", (snapshot) => {
-		// 	let id = snapshot.key;
-		// 	let data = snapshot.val();
-		//   	this.compareData(id, data);
-		// });
+		chainV2Ref.on("child_removed", (snapshot) => {
+			let id = snapshot.key;
+			let data = snapshot.val();
+		  	this.compareData(id, data);
+		});
+	}
 
-		// Verschillende types maken
-		// chainUsersRef.on("child_removed", (snapshot) => {
-		// 	let id = snapshot.key;
-		// 	let data = snapshot.val();
-		//   	this.compareData(id, data);
-		// });
+	dataAdds() {
+		chainUsersRef.on("child_added", (snapshot) => {
+			let id = snapshot.key;
+			let data = snapshot.val();
+		  	this.removeData(id, data);
+		});
 
-		// chainV1Ref.on("child_removed", (snapshot) => {
-		// 	let id = snapshot.key;
-		// 	let data = snapshot.val();
-		//   	this.compareData(id, data);
-		// });
+		chainV1Ref.on("child_added", (snapshot) => {
+			let id = snapshot.key;
+			let data = snapshot.val();
+		  	this.removeData(id, data);
+		});
 
-		// chainV2Ref.on("child_removed", (snapshot) => {
-		// 	let id = snapshot.key;
-		// 	let data = snapshot.val();
-		//   	this.compareData(id, data);
-		// });
+		chainV2Ref.on("child_added", (snapshot) => {
+			let id = snapshot.key;
+			let data = snapshot.val();
+		  	this.removeData(id, data);
+		});
+	}
+
+	removeData(id, data) {
+		//console.log(id, data)
 	}
 
 	compareData(id, data) {

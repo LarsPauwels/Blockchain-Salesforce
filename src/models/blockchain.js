@@ -12,6 +12,8 @@ const chainV2Ref = db.ref('blockchain/chain-v2');
 class Blockchain {
 	constructor() {
 		validation.dataChanges();
+		validation.dataDeletes();
+		validation.dataAdds();
 
 		this.getData((chain) => {
 			this.chain = [chain];
@@ -45,6 +47,15 @@ class Blockchain {
 		return this.chain[this.chain.length - 1];
 	}
 
+	getIdLatestBlock() {
+		let key;
+		chainUsersRef.orderByChild("timestamp")
+		.limitToLast(1).once("value", (snapshot) => {
+			key = Object.keys(snapshot.val())[0];
+		});
+		return key;
+	}
+
 	getIndex(callback) {
 		return chainUsersRef.once("value", snapshot => {
 			return callback(snapshot.numChildren());
@@ -53,7 +64,7 @@ class Blockchain {
 
 	minePendingTransaction() {
 		this.getIndex((size) => {
-			let block = new Block(size, this.pendingTransaction, this.getLatestBlock().hash);
+			let block = new Block(size, this.pendingTransaction, this.getLatestBlock()[0][this.getIdLatestBlock()].hash);
 			block.mineBlock(this.difficulty);
 			this.addToDatabase(block);
 
