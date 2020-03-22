@@ -68,7 +68,10 @@ class Blockchain {
 			block.mineBlock(this.difficulty);
 			this.addToDatabase(block);
 
-			this.chain.push(block);
+			this.getData((chain) => {
+				this.chain = chain;
+			});
+			
 			this.pendingTransaction = [];
 		});
 	}
