@@ -110,10 +110,6 @@ class Blockchain {
 	}
 
 	createPendingTransaction(transaction) {
-		if (!transaction.fromAdress) {
-			throw new Error('Data must include from adress.');
-		}
-
 		if (!transaction.isValid()) {
 			throw new Error('Cannot add invalid data to chain!');
 		}

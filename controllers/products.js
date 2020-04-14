@@ -25,24 +25,6 @@ let createProduct = (req, res) => {
         "status": "success",
         "message": `Transaction successfully added.`
     });
-
-    if (blockchain.pendingTransaction.length !== 0) {
-		blockchain.minePendingTransaction();
-
-		res.json(
-	        {
-	        	status: "success",
-	            message: 'Mining new Block successfully!'
-	        }
-	    );
-	} else {
-        res.json(
-            {
-                status: "fail",
-                message: 'Currently no blocks to mine!'
-            }
-        );
-    }
 }
 
 let mineProduct = (req, res) => {
