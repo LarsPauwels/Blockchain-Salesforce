@@ -129,6 +129,12 @@ npm install
 ```
 4. Place your Service Account Key from Firebase in the database folder with the name `ServiceAccountKey.json`
 
+### Heroku
+1. Create a Heroku account at [Heroku](https://dashboard.heroku.com/apps)
+2. Go to `Deploy` and select Github as `Deployment Method`
+3. Connect your Github account and select your Reposetory
+4. Click `Enable Automatic Deploys`for automating updates
+4. Click `Deploy Branch`to start the deployment
 
 
 <!-- USAGE EXAMPLES -->
