@@ -82,7 +82,7 @@ The API contains a user registration and login for creating peers in the network
 The features tha will be added in the future:
 *  Extensive work on the validation of transaction data.
 *  Extensive work on the validation of the blocks added to the chain.
-*  New end-point for companies. So that a peer can be linked to a campany.
+*  New end-point for companies. So that a peer can be linked to a company.
 *  Adding storage for images and/or files. So you can add the url to the transaction data.
 *  Adding creation/updated date to the peers and copanies.
 *  Adding a switch between username and email for the login end-point.
